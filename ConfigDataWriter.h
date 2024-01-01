@@ -1,7 +1,5 @@
 #ifndef CONFIGDATAWRITER_H
 #define CONFIGDATAWRITER_H
-
-
 /* Cfg structure*/
 struct ConfigData
 {
@@ -9,7 +7,6 @@ struct ConfigData
     int max_rot_speed;
     int airflow_pressure;
 };
-
 class ConfigDataWriter
 {
 public:
