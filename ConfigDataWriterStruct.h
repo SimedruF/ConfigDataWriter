@@ -1,7 +1,8 @@
 /* Cfg structure*/
 struct ConfigData
 {
-    int blades_nb;
-    int max_rot_speed;
-    int airflow_pressure;
+    int value1;
+    int value2;
+    int value3;
+    char cfgData[200];
 };

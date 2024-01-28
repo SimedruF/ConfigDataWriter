@@ -1,5 +1,4 @@
 #include "ConfigDataWriter.h"
-#include <cstring>
 #include <stdlib.h>
 #include <stdio.h>
 /// @brief ConfigDataWriter constructor
@@ -7,27 +6,20 @@
 ConfigDataWriter::ConfigDataWriter(const char *fileName)
 {
     snprintf(this->fileName, sizeof(this->fileName), "%s", fileName);
-    printf("FileName :%s\n",this->fileName);
 }
 /// @brief Saving config data to a file in binary format
 /// @param configItem Contain the values to be saved in the file
 /// @return Error to open the file=-1, Error to write the file=-2 , OK = 0
 int ConfigDataWriter::SaveCfgDataBinary(const ConfigData &configItem)
 {
-    // Add .ini handle for UserData type
+    // FILE handle
     FILE *open_file;
     int ret_value = -1;
     size_t fwrite_ret = 0;
-    char fileNameE[50] = "equilibrium_app.cfg";
-    if(  strcmp(this->fileName,fileNameE) != 0)
-    {
-        snprintf(this->fileName, sizeof(this->fileName), "%s", fileNameE);
-        printf("FileName :%s\n",this->fileName);
-    }
     open_file = fopen(this->fileName, "w");
     if (open_file == NULL)
     {
-        fprintf(stderr, " Error to open the file !\n");
+        fprintf(stderr, " Error to open the file \n");
         printf("FileName :%s\n",this->fileName);
         ret_value = -1;
     }
@@ -114,6 +106,7 @@ int ConfigDataWriter::ReadSimpleConfig(int *configItems)
     FILE *configFile = fopen(this->fileName, "r");
     if (configFile != NULL)
     {
+        int num_of_flights;
         char buffer[255];
         /* Seek to the beginning of the file */
         fseek(configFile, 0, SEEK_SET);
@@ -270,6 +263,7 @@ int ConfigDataWriter::ReadIniConfig(int *configItems)
     FILE *configFile = fopen(this->fileName, "r");
     if (configFile != NULL)
     {
+        int num_of_flights;
         char buffer[255];
         /* Seek to the beginning of the file */
         fseek(configFile, 0, SEEK_SET);
@@ -291,4 +285,18 @@ int ConfigDataWriter::ReadIniConfig(int *configItems)
         return -1;
     }
     return i;
+}
+/// @brief Set cfg buffer
+/// @param cfg_buffer
+/// @param size
+void ConfigDataWriter::SetCfgBuffer(char *cfg_buffer, int size)
+{
+    snprintf(this->cfgBuffer, size, "%s", cfg_buffer);
+}
+
+/// @brief Get cfg buffer
+/// @return cfgBuffer
+char* ConfigDataWriter::GetCfgBuffer()
+{
+    return this->cfgBuffer;
 }

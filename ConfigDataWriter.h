@@ -24,9 +24,18 @@ public:
     /// Read ini file -> parsing the ini file to identify the sections
     /// and for each section the list of config variables -> work in progress
     int ReadIniConfig(int *configItems);
+    
+    /// @brief Set cfg buffer
+    /// @param cfg_buffer 
+    /// @param size 
+    void SetCfgBuffer(char *cfg_buffer, int size);
+    
+    /// Get cfg buffer 
+    char *GetCfgBuffer();
 
 private:
-    char fileName[100];
+    char fileName[200];
+    char cfgBuffer[200];
 };
 
 #endif // CONFIGDATAWRITER_H
