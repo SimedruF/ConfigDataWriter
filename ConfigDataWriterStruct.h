@@ -1,8 +1,11 @@
+#ifndef ConfigData
 /* Cfg structure*/
 struct ConfigData
 {
-    int value1;
-    int value2;
-    int value3;
+    int blades_nb;
+    int max_rot_speed;
+    int airflow_pressure;
+    float diameter;
     char cfgData[200];
 };
+#endif

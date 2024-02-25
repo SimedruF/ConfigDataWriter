@@ -1,11 +1,16 @@
 #include "ConfigDataWriter.h"
+#include <cstring>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+
+
+
 /// @brief ConfigDataWriter constructor
 /// @param fileName Filename
 ConfigDataWriter::ConfigDataWriter(const char *fileName)
 {
-    snprintf(this->fileName, sizeof(this->fileName), "%s", fileName);
+    snprintf(this->fileName, 30, "%s", fileName);
 }
 /// @brief Saving config data to a file in binary format
 /// @param configItem Contain the values to be saved in the file
@@ -17,21 +22,63 @@ int ConfigDataWriter::SaveCfgDataBinary(const ConfigData &configItem)
     int ret_value = -1;
     size_t fwrite_ret = 0;
     open_file = fopen(this->fileName, "w");
+    if(  strcmp(this->fileName,CFG_FILE) != 0)
+    {
+        snprintf(this->fileName, sizeof(this->fileName), "%s", CFG_FILE);
+        printf("FileName :%s\n",this->fileName);
+    }
     if (open_file == NULL)
     {
-        fprintf(stderr, " Error to open the file \n");
+         printf(" SaveCfgDataBinary: Error to open the file \n");
         printf("FileName :%s\n",this->fileName);
         ret_value = -1;
     }
     fwrite_ret = fwrite(&configItem, sizeof(configItem)+1, 1, open_file);
     if (fwrite_ret != 0)
     {
-        printf("Content written successfully !\n");
+        printf("SaveCfgDataBinary: Content written successfully !\n");
         ret_value = 0;
     }
     else
     {
-        printf("Error writing file !\n");
+        printf("SaveCfgDataBinary: Error writing file !\n");
+        ret_value = -2;
+    }
+
+    fclose(open_file);
+    return ret_value;
+}
+/// @brief Saving config data to a file in binary format
+/// @param configItem Contain the values to be saved in the file
+/// @return Error to open the file=-1, Error to write the file=-2 , OK = 0
+int ConfigDataWriter::SaveCfgDataBinary(const char *fileName, const ConfigData &configItem)
+{
+    // FILE handle
+    FILE *open_file;
+    int ret_value = -1;
+    size_t fwrite_ret = 0;
+    snprintf(this->fileName, 30, "%s", fileName);
+    open_file = fopen(this->fileName, "w");
+    if(  strcmp(this->fileName,CFG_FILE) != 0)
+    {
+        snprintf(this->fileName, sizeof(this->fileName), "%s", CFG_FILE);
+        printf("FileName :%s\n",this->fileName);
+    }
+    if (open_file == NULL)
+    {
+        fprintf(stderr, " SaveCfgDataBinary: Error to open the file \n");
+        printf("FileName :%s\n",this->fileName);
+        ret_value = -1;
+    }
+    fwrite_ret = fwrite(&configItem, sizeof(configItem)+1, 1, open_file);
+    if (fwrite_ret != 0)
+    {
+        printf("SaveCfgDataBinary: Content written successfully !\n");
+        ret_value = 0;
+    }
+    else
+    {
+        printf("SaveCfgDataBinary: Error writing file !\n");
         ret_value = -2;
     }
 
@@ -46,11 +93,18 @@ int ConfigDataWriter::LoadCfgDataBinary(ConfigData &configItem)
     // Add handle for ConfigData type
     FILE *open_file;
     int ret_value = -1;
-    size_t fread_ret = 0;
+    size_t fread_ret = 0; 
+
+    if(  strcmp(this->fileName,CFG_FILE) != 0)
+    {
+        snprintf(this->fileName, sizeof(this->fileName), "%s", CFG_FILE);
+        printf("FileName :%s\n",this->fileName);
+    }
     open_file = fopen(this->fileName, "r");
     if (open_file == NULL)
     {
-        fprintf(stderr, " Error to open the file !\n");
+        fprintf(stderr, " LoadCfgDataBinary: Error to open the file !\n");
+        printf("FileName :%s\n",this->fileName);
         ret_value = -1;
     }
     /* Seek to the beginning of the file */
@@ -61,12 +115,12 @@ int ConfigDataWriter::LoadCfgDataBinary(ConfigData &configItem)
 
     if (fread_ret != 0)
     {
-        printf("Content read successfully !\n");
+        printf("LoadCfgDataBinary: Content read successfully !\n");
         ret_value = 0;
     }
     else
     {
-        printf("Error reading file %s!\n",this->fileName);
+        printf("LoadCfgDataBinary:Error reading file %s!\n",this->fileName);
         ret_value = -2;
     }
 
@@ -78,6 +132,7 @@ int ConfigDataWriter::LoadCfgDataBinary(ConfigData &configItem)
 /// @return NOK =-1 , OK = 0
 int ConfigDataWriter::SaveSimpleConfig(int *configItems, int size)
 {
+    int ret_value = -1;
     FILE *configFile = fopen(this->fileName, "w");
     if (configFile != NULL)
     {
@@ -86,15 +141,15 @@ int ConfigDataWriter::SaveSimpleConfig(int *configItems, int size)
             // write the config items in file
             fprintf(configFile, "%d\n", configItems[i]);
         }
-        // close the file
-        fclose(configFile);
+        ret_value = 0;
     }
     else
     {
         fprintf(stderr, "Error to open the file !\n");
-        return -1;
+        ret_value = - 1;
     }
-
+    // close the file
+    fclose(configFile);
     return 0;
 }
 /// @brief Reading integer data from a file
@@ -118,13 +173,15 @@ int ConfigDataWriter::ReadSimpleConfig(int *configItems)
             configItems[i] = testvalue;
             i = i + 1;
         }
-        // Alte structuri pot fi adăugate la nevoie
+        // close the file
         fclose(configFile);
     }
     else
     {
-        fprintf(stderr, " Error to open the file \n");
+        fprintf(stderr, " ReadSimpleConfig: Error to open the file \n");
         printf("FileName :%s\n", this->fileName);
+        // close the file
+        fclose(configFile);
         return -1;
     }
     return i;
@@ -216,12 +273,52 @@ int ConfigDataWriter::SaveFloatDataCSV(const char *TableHead, int size, float *c
     else
     {
         fprintf(stderr, "Error to open the file!\n");
+        // close the file
+        fclose(configFile);
         return -1;
     }
 
     return 0;
 }
 
+/// @brief Save cfg data to a csv file
+/// @param TableHead Head of the table
+/// @param size The size of the TableHead
+/// @param configItems Saved data - ConfigData
+/// @param lines The number of lines in configuration
+/// @return OK=0 NOK =-1
+int ConfigDataWriter::SaveCfgDataCSV(const char *TableHead, int size, const char *configItems, int lines)
+{
+    FILE *configFile = fopen(this->fileName, "w");
+    char TableHeadArr[255];
+    snprintf(TableHeadArr, size, "%s", TableHead);
+    if (configFile != NULL)
+    {
+        for (int ix = 0; ix < size; ix++)
+        {
+            // write the config items in file
+            fprintf(configFile, "%c", TableHeadArr[ix]);
+        }
+        fprintf(configFile, "\n"); // go to the next row
+        for (int i = 0; i < lines; i++)
+        {
+
+            fprintf(configFile, "%s", configItems);
+            fprintf(configFile, "\n"); // go to the next row
+        }
+        // close the file
+        fclose(configFile);
+    }
+    else
+    {
+        fprintf(stderr, "SaveCfgDataCSV: Error to open the file!\n");
+        // close the file
+        fclose(configFile);
+        return -1;
+    }
+
+    return 0;
+}
 /// @brief Save ini file 
 /// @param Comment The comment befor each section
 /// @param Section The section name
@@ -248,6 +345,8 @@ int ConfigDataWriter::SaveIniConfig(char*Comment, char *Section, char ConfigItem
     else
     {
         fprintf(stderr, "Error to open the file!\n");
+        // close the file
+        fclose(configFile);
         return -1;
     }
 
@@ -275,13 +374,15 @@ int ConfigDataWriter::ReadIniConfig(int *configItems)
             configItems[i] = testvalue;
             i = i + 1;
         }
-        // Alte structuri pot fi adăugate la nevoie
+        // close the file
         fclose(configFile);
     }
     else
     {
-        fprintf(stderr, " Error to open the file \n");
+        fprintf(stderr, " ReadIniConfig: Error to open the file \n");
         printf("FileName :%s\n", this->fileName);
+        // close the file
+        fclose(configFile);
         return -1;
     }
     return i;
@@ -299,4 +400,58 @@ void ConfigDataWriter::SetCfgBuffer(char *cfg_buffer, int size)
 char* ConfigDataWriter::GetCfgBuffer()
 {
     return this->cfgBuffer;
+}
+/// @brief Read a csv file
+/// @param fileName 
+/// @return Returns 0 if the operation was succesfull and -1 if the file can't be opened
+int ConfigDataWriter::ReadCSV_File(const char *fileName)
+{
+    char fileNameLocal[200];
+    int num_tokens = 0;
+    int num_lines = 0;
+    int column = 0;
+    snprintf(fileNameLocal, 30, "%s", fileName);
+    FILE *file = fopen(fileNameLocal, "r");
+    if (file == NULL)
+    {
+        fprintf(stderr, "ReadCSV_File: Error to open the file \n");
+        fclose(file);
+        return -1;
+    }
+
+    static char line[MAX_LINE_LENGTH];
+    while (fgets(line, sizeof(line), file))
+    {
+        num_lines++;
+        column = 0;
+        num_tokens = 0;
+        char *token;
+        token = strtok(line, ",");
+        if (token != NULL && num_tokens < MAX_NUM_FIELDS)
+        {
+            while (token)
+            {
+                printf("\nLine %d -> column %d = %s\t", num_lines, column, token);
+                csv_tokens[num_tokens++] = token;
+                token = strtok(NULL, ", ");
+                column++;
+            }
+        }
+    }
+    csv_num_tokens = num_tokens;
+    fclose(file);
+    return num_tokens;
+}
+/// @brief 
+/// @return 
+int ConfigDataWriter::GetCsvNumTokens()
+{
+    return csv_num_tokens;
+}
+/// @brief 
+/// @param token_index 
+/// @return 
+char *ConfigDataWriter::GetCsvToken(int token_index)
+{
+    return csv_tokens[token_index];
 }
