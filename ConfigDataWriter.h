@@ -1,7 +1,7 @@
 #ifndef CONFIGDATAWRITER_H
 #define CONFIGDATAWRITER_H
 #include "ConfigDataWriterStruct.h"
-#define CFG_FILE (char*)"equilibrium_app.cfg"
+#define CFG_FILE (char*)"ea_test1.cfg"
 #define MAX_LINE_LENGTH 1024
 #define MAX_NUM_FIELDS 100
 
