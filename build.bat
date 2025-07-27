@@ -1,1 +1,0 @@
- gcc ConfigDataWriter.cpp test.cpp -o test.exe
