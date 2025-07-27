@@ -26,14 +26,16 @@ config.SaveCfgDataBinary(data);
 config.LoadCfgDataBinary(data);
 ```
 
-## File Overview
-- `ConfigDataWriter.h` / `ConfigDataWriter.cpp`: Main class implementation
-- `ConfigDataWriterStruct.h`: Configuration data structure definition
-- `test.cpp` / `test.h`: Example usage and test structures
-- `build.sh` / `build.bat`: Build scripts for Linux and Windows
-- `app_cfg.csv`, `integer_data.csv`, `float_data.csv`: Example CSV files
-- `program.ini`: Example INI configuration file
-- `ea_test1.cfg`, `ea_test1.txt`: Example config files
+## File & Folder Overview
+- `source/ConfigDataWriter.h`, `source/ConfigDataWriter.cpp`, `source/ConfigDataWriterStruct.h`: Main class and configuration structure implementation
+- `test/test.cpp`, `test/test.h`: Main test file and test structures
+- `test/test_ini.cpp`: Dedicated test for INI file operations
+- `test/data/`: Contains all test data files:
+    - `app_cfg.csv`, `integer_data.csv`, `float_data.csv`: Example CSV files
+    - `program.ini`: Example INI configuration file
+    - `ea_test1.cfg`, `ea_test1.txt`: Example config files
+- `build/build.sh`, `build/build.bat`: Build scripts for Linux and Windows
+- `build/`: Compiled executables and build configuration files
 
 ## Build
 To build the project on Linux:
